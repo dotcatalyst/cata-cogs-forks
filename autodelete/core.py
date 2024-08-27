@@ -139,7 +139,7 @@ class AutoDelete(commands.Cog):
                 )
 
             channels: Dict[str, int] = guild_data["channels"]  # type: ignore
-            for channel_id, days in channels.items():
+            for channel_id, timer in channels.items():
                 channel: Optional[discord.TextChannel] = guild.get_channel(int(channel_id))  # type: ignore
                 if not channel:
                     continue
@@ -147,7 +147,7 @@ class AutoDelete(commands.Cog):
                     messages: List[discord.Message] = await channel.purge(
                         limit=None,
                         check=_ignored_role_check,
-                        before=datetime.datetime.utcnow() - datetime.timedelta(days=days),
+                        before=datetime.datetime.utcnow() - datetime.timedelta(days=timer['days'], hours=timer['hours'], minutes=timer['minutes'], seconds=timer['seconds']),
                     )
                 except discord.HTTPException as error:
                     log.exception(
@@ -171,7 +171,10 @@ class AutoDelete(commands.Cog):
         ctx: commands.GuildContext,
         add_or_remove: Literal["add", "remove"],
         channel: discord.TextChannel,
-        days: Optional[commands.Range[int, 1, 13]] = None,
+        days: Optional[commands.Range[int, 0, 13]] = 0,
+        hours: Optional[commands.Range[int, 0, 23]] = 0,
+        minutes: Optional[commands.Range[int, 0, 59]] = 0,
+        seconds: Optional[commands.Range[int, 0, 59]] = 0,
     ):
         """
         Add or remove auto delete rules for channels.
@@ -186,7 +189,7 @@ class AutoDelete(commands.Cog):
                 raise commands.UserFeedbackCheckFailure(
                     f"{channel.mention} already has an auto delete rule.",
                 )
-            channels[str(channel.id)] = days
+            channels[str(channel.id)] = {'days': days, 'hours': hours, 'minutes': minutes, 'seconds': seconds}
             await self.config.guild(ctx.guild).channels.set(channels)
             await ctx.send(
                 f"Added autodelete rule to delete messages older than {days} days from {channel.mention}.",
