@@ -68,7 +68,7 @@ class Bigmoji(commands.Cog):
         else:
             chars = []
             name = []
-            print(emoji)
+
             for char in emoji:
                 chars.append(str(hex(ord(char)))[2:])
                 try:
@@ -87,7 +87,6 @@ class Bigmoji(commands.Cog):
                 # COMBINING ENCLOSING KEYCAP doesn't want to play nice either
                 chars.remove("fe0f")
 
-            print(chars)
             if svg_convert is not None:
                 url = "https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/" + "".join(chars) + ".svg"
                 convert = True
