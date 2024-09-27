@@ -119,10 +119,10 @@ class Bigmoji(commands.Cog):
     def generate(img):
         # Designed to be run in executor to avoid blocking
         if svg_convert == "cairo":
-            kwargs = {"parent_width": 1024, "parent_height": 1024}
+            kwargs = {"parent_width": 256, "parent_height": 256}
             return io.BytesIO(cairosvg.svg2png(bytestring=img, **kwargs))
         elif svg_convert == "wand":
-            with Image(blob=img, format="svg", resolution=2160) as bob:
+            with Image(blob=img, format="svg", resolution=256) as bob:
                 return bob.make_blob("png")
         else:
             return io.BytesIO(img)
